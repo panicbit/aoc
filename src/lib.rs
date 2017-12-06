@@ -13,15 +13,6 @@ use std::io::{Read, Write};
 use std::fs::File;
 use std::collections::HashMap;
 
-#[macro_export]
-macro_rules! aoc {
-    ($event:expr, $day:expr, $level:expr, |$input:ident| $code:expr) => {
-        fn main() {
-            $crate::cli::run(&$event.to_string(), $day, $level, |$input| $code);
-        }
-    }
-}
-
 pub mod cli;
 
 pub type Result<T> = ::std::result::Result<T, failure::Error>;
