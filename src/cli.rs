@@ -10,22 +10,19 @@ struct Cli<'a, F, R> where
     day: u8,
     level: u8,
     code: F,
-    client: Client,
 }
 
 impl<'a, F, R> Cli<'a, F, R> where
     F: Fn(&str) -> R,
     R: Display,
 {
-    fn new(event: &'a str, day: u8, level: u8, code: F) -> Result<Self> {
-        let session_token = ::get_session_token()?;
-        Ok(Self {
+    fn new(event: &'a str, day: u8, level: u8, code: F) -> Self {
+        Self {
             event,
             day,
             level,
             code,
-            client: Client::new(event, session_token)?,
-        })
+        }
     }
 
     fn run(&self) -> Result<()> {
@@ -39,6 +36,8 @@ impl<'a, F, R> Cli<'a, F, R> where
                     .short("s")
                     .long("session")
                     .help("Set the session token / cookie")
+                    .value_name("TOKEN")
+                    .takes_value(true)
                 )
             )
             .get_matches();
@@ -51,7 +50,8 @@ impl<'a, F, R> Cli<'a, F, R> where
     }
 
     fn default(&self) -> Result<()> {
-        let input = self.client.get_input(self.day)?;
+        let client = Client::new(self.event, ::get_session_token()?)?;
+        let input = client.get_input(self.day)?;
         let result = (self.code)(&input);
 
         println!("Result: '{}'", result);
@@ -60,12 +60,13 @@ impl<'a, F, R> Cli<'a, F, R> where
     }
 
     fn submit(&self) -> Result<()> {
-        let input = self.client.get_input(self.day)?;
+        let client = Client::new(self.event, ::get_session_token()?)?;
+        let input = client.get_input(self.day)?;
         let result = (self.code)(&input).to_string();
 
         println!("Submitting '{}' for AoC {} day {} part {}\n", result, self.event, self.day, self.level);
 
-        let response = self.client.submit_solution(self.day, self.level, &result)?;
+        let response = client.submit_solution(self.day, self.level, &result)?;
 
         println!("{}", response);
 
@@ -85,10 +86,7 @@ pub fn run<F, R>(event: &str, day: u8, level: u8, code: F) where
     F: Fn(&str) -> R,
     R: Display,
 {
-    let res = Cli::new(event, day, level, code)
-        .and_then(|cli| cli.run());
-
-    if let Err(error) = res {
+    if let Err(error) = Cli::new(event, day, level, code).run() {
         println!("Error: {}", error.cause());
         for cause in error.causes().skip(1) {
             println!("caused by: {}", cause);
