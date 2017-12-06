@@ -96,9 +96,9 @@ pub fn run<F, R>(event: &str, day: u8, level: u8, code: F) where
 
 #[macro_export]
 macro_rules! aoc {
-    ($event:expr, $day:expr, $level:expr, |$input:ident| $code:expr) => {
+    ($event:expr, $day:expr, $level:expr, $code:expr) => {
         fn main() {
-            $crate::cli::run(&$event.to_string(), $day, $level, |$input| $code);
+            $crate::cli::run(&$event.to_string(), $day, $level, $code);
         }
     }
 }
