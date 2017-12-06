@@ -18,6 +18,7 @@ pub mod cli;
 pub mod leaderboard;
 pub mod config;
 pub mod client;
+pub mod util;
 
 pub type Result<T> = ::std::result::Result<T, failure::Error>;
 

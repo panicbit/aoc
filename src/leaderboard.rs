@@ -4,8 +4,7 @@ use std::collections::BTreeMap;
 use failure::ResultExt;
 use chrono::prelude::*;
 use chrono::Duration;
-use chrono_tz::US::Eastern;
-use Result;
+use {util, Result};
 
 #[derive(Serialize,Deserialize,Debug,Clone)]
 pub struct Leaderboard {
@@ -48,20 +47,9 @@ impl Leaderboard {
         Ok(year)
     }
 
-    pub fn num_unlocked_days(&self) -> Result<u32> {
+    pub fn num_unlocked_days(&self) -> Result<u8> {
         let year = self.year()?;
-        let december_start = Eastern.ymd(year as i32, 12, 1).and_hms(0, 0, 0);
-        let days = Utc::now().signed_duration_since(december_start).num_days() + 1;
-
-        if days <= 0 {
-            Ok(0)
-        }
-        else if days > 25 {
-            Ok(25)
-        }
-        else {
-            Ok(days as u32)
-        }
+        util::num_unlocked_days(year)
     }
 
     pub fn next_unlock_date(&self) -> Result<Option<DateTime<Local>>> {
@@ -69,13 +57,7 @@ impl Leaderboard {
         let num_unlocked_days = self.num_unlocked_days()?;
         let next_locked_day = num_unlocked_days + 1;
 
-        if next_locked_day > 25 {
-            return Ok(None);
-        }
-
-        let next_unlock = Eastern.ymd(year as i32, 12, next_locked_day).and_hms(0, 0, 0);
-
-        Ok(Some(next_unlock.with_timezone(&Local)))
+        util::unlock_date(year, next_locked_day)
     }
 
     pub fn duration_until_next_unlock(&self) -> Result<Option<Duration>> {
