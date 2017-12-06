@@ -1,10 +1,13 @@
 extern crate reqwest;
 extern crate cachedir;
-#[macro_use]
-extern crate failure;
 extern crate preferences;
 extern crate clap;
 extern crate select;
+extern crate serde;
+extern crate chrono;
+extern crate chrono_tz;
+#[macro_use] extern crate failure;
+#[macro_use] extern crate serde_derive;
 
 use preferences::{AppInfo, Preferences};
 use reqwest::header::Cookie;
@@ -14,7 +17,11 @@ use std::io::{Read, Write};
 use std::fs::File;
 use std::collections::HashMap;
 
+pub use self::leaderboard::Leaderboard;
+
 pub mod cli;
+pub mod leaderboard;
+pub mod config;
 
 pub type Result<T> = ::std::result::Result<T, failure::Error>;
 
