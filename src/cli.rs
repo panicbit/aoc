@@ -1,6 +1,6 @@
 use std::fmt::Display;
 use {Result, Client};
-use clap::{App, SubCommand};
+use clap::{App, SubCommand, Arg, ArgMatches};
 
 struct Cli<'a, F, R> where
     F: Fn(&str) -> R,
@@ -33,10 +33,19 @@ impl<'a, F, R> Cli<'a, F, R> where
             .subcommand(SubCommand::with_name("submit")
                 .about("Submit the solution")
             )
+            .subcommand(SubCommand::with_name("config")
+                .about("Configure advent of code settings")
+                .arg(Arg::with_name("session")
+                    .short("s")
+                    .long("session")
+                    .help("Set the session token / cookie")
+                )
+            )
             .get_matches();
 
         match cli.subcommand() {
             ("submit", _) => self.submit(),
+            ("config", Some(args)) => self.config(args),
             _ => self.default(),
         }
     }
@@ -59,6 +68,14 @@ impl<'a, F, R> Cli<'a, F, R> where
         let response = self.client.submit_solution(self.day, self.level, &result)?;
 
         println!("{}", response);
+
+        Ok(())
+    }
+
+    fn config(&self, args: &ArgMatches) -> Result<()> {
+        if let Some(token) = args.value_of("session") {
+            ::set_session_token(token)?;
+        }
 
         Ok(())
     }
