@@ -1,14 +1,17 @@
 extern crate reqwest;
 extern crate cachedir;
+#[macro_use]
 extern crate failure;
 extern crate preferences;
 extern crate clap;
+extern crate select;
 
 use preferences::{AppInfo, Preferences};
 use reqwest::header::Cookie;
 use cachedir::{CacheDirConfig, CacheDir};
 use std::io::{Read, Write};
 use std::fs::File;
+use std::collections::HashMap;
 
 #[macro_export]
 macro_rules! aoc {
@@ -94,7 +97,32 @@ impl Client {
     }
 
     pub fn submit_solution(&self, day: u8, level: u8, solution: &str) -> Result<String> {
-        unimplemented!()
+        use select::document::Document;
+        use select::predicate::Name;
+
+        let url = format!("https://adventofcode.com/{}/day/{}/answer", self.event, day);
+        let mut cookie = Cookie::new();
+        cookie.set("session", self.session_token.clone());
+
+        let mut params = HashMap::new();
+        params.insert("level", level.to_string());
+        params.insert("answer", solution.into());
+
+        let response = self.client
+            .post(&url)
+            .header(cookie)
+            .form(&params)
+            .send()?
+            .error_for_status()?
+            .text()?;
+
+        let doc = Document::from(response.as_str());
+        let node = doc.find(Name("main")).next().ok_or_else(|| format_err!("Response element not found"))?;
+        let text = node.text();
+        let text = text.trim().split(".  ").next().unwrap_or("");
+        let text = format!("{}.", text);
+
+        Ok(text)
     }
 }
 

@@ -54,9 +54,11 @@ impl<'a, F, R> Cli<'a, F, R> where
         let input = self.client.get_input(self.day)?;
         let result = (self.code)(&input).to_string();
 
-        println!("Submitting '{}' for AoC {} day {} part {}", result, self.event, self.day, self.level);
+        println!("Submitting '{}' for AoC {} day {} part {}\n", result, self.event, self.day, self.level);
 
-        self.client.submit_solution(self.day, self.level, &result)?;
+        let response = self.client.submit_solution(self.day, self.level, &result)?;
+
+        println!("{}", response);
 
         Ok(())
     }
