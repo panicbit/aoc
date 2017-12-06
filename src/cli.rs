@@ -85,8 +85,15 @@ pub fn run<F, R>(event: &str, day: u8, level: u8, code: F) where
     F: Fn(&str) -> R,
     R: Display,
 {
-    let app = Cli::new(event, day, level, code).unwrap();
-    app.run().unwrap();
+    let res = Cli::new(event, day, level, code)
+        .and_then(|cli| cli.run());
+
+    if let Err(error) = res {
+        println!("Error: {}", error.cause());
+        for cause in error.causes().skip(1) {
+            println!("caused by: {}", cause);
+        }
+    }
 }
 
 #[macro_export]

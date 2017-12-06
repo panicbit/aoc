@@ -9,6 +9,7 @@ extern crate select;
 use preferences::{AppInfo, Preferences};
 use reqwest::header::Cookie;
 use cachedir::{CacheDirConfig, CacheDir};
+use failure::ResultExt;
 use std::io::{Read, Write};
 use std::fs::File;
 use std::collections::HashMap;
@@ -118,11 +119,13 @@ impl Client {
 }
 
 pub fn get_session_token() -> Result<String> {
-    let token = String::load(APP_INFO, "session_token")?;
+    let token = String::load(APP_INFO, "session_token")
+        .context("Failed to load session token")?;
     Ok(token)
 }
 
 pub fn set_session_token<S: Into<String>>(token: S) -> Result<()> {
-    token.into().save(APP_INFO, "session_token")?;
+    token.into().save(APP_INFO, "session_token")
+        .context("Failed to save session token")?;
     Ok(())
 }
