@@ -32,18 +32,13 @@ pub fn set_leaderboard_url<U: Into<String>>(url: U) -> Result<()> {
 }
 
 pub fn session_token() -> Result<String> {
-    let url = String::load(APP_INFO, CONF_SESSION_TOKEN)
-        .context("Session token not set.\n\
-                  Set one using `--session SESSION_TOKEN`.\n\
-                  Get this one from the AoC cookies.\n\
-                  It's the value of the key called `session`.\n\
-                  How to do this depends on your browser.\n\
-                  Use google or ask around if needed.")?;
-    Ok(url)
+    let token = String::load(APP_INFO, CONF_SESSION_TOKEN)
+        .context("Failed to load session token")?;
+    Ok(token)
 }
 
-pub fn set_session_token<T: Into<String>>(token: T) -> Result<()> {
-    token.into().save(APP_INFO, "session_token")
+pub fn set_session_token<S: Into<String>>(token: S) -> Result<()> {
+    token.into().save(APP_INFO, CONF_SESSION_TOKEN)
         .context("Failed to save session token")?;
     Ok(())
 }

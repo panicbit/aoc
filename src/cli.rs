@@ -1,5 +1,5 @@
 use std::fmt::Display;
-use {Result, Client};
+use {config, Result, Client};
 use clap::{App, SubCommand, Arg, ArgMatches};
 
 struct Cli<'a, F, R> where
@@ -50,7 +50,7 @@ impl<'a, F, R> Cli<'a, F, R> where
     }
 
     fn default(&self) -> Result<()> {
-        let client = Client::new(self.event, ::get_session_token()?)?;
+        let client = Client::new(self.event, config::session_token()?)?;
         let input = client.get_input(self.day)?;
         let result = (self.code)(&input);
 
@@ -60,7 +60,7 @@ impl<'a, F, R> Cli<'a, F, R> where
     }
 
     fn submit(&self) -> Result<()> {
-        let client = Client::new(self.event, ::get_session_token()?)?;
+        let client = Client::new(self.event, config::session_token()?)?;
         let input = client.get_input(self.day)?;
         let result = (self.code)(&input).to_string();
 
@@ -75,7 +75,7 @@ impl<'a, F, R> Cli<'a, F, R> where
 
     fn config(&self, args: &ArgMatches) -> Result<()> {
         if let Some(token) = args.value_of("session") {
-            ::set_session_token(token)?;
+            config::set_session_token(token)?;
         }
 
         Ok(())
