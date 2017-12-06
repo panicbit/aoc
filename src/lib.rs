@@ -111,8 +111,8 @@ impl Client {
         let doc = Document::from(response.as_str());
         let node = doc.find(Name("main")).next().ok_or_else(|| format_err!("Response element not found"))?;
         let text = node.text();
-        let text = text.trim().split(".  ").next().unwrap_or("");
-        let text = format!("{}.", text);
+        // let text = text.trim().split(".  ").next().unwrap_or("");
+        let text = format!("{}.", text.trim());
 
         Ok(text)
     }
