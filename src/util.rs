@@ -3,8 +3,8 @@ use chrono_tz::US::Eastern;
 use Result;
 
 pub fn num_unlocked_days(year: u32) -> Result<u8> {
-    let december_start = Eastern.ymd(year as i32, 12, 1).and_hms(0, 0, 0);
-    let days = Utc::now().signed_duration_since(december_start).num_days() + 1;
+    let end_of_november = Eastern.ymd(year as i32, 11, 30).and_hms(0, 0, 0);
+    let days = Utc::now().signed_duration_since(end_of_november).num_days();
 
     if days <= 0 {
         Ok(0)
