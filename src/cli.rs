@@ -30,21 +30,12 @@ impl<'a, F, R> Cli<'a, F, R> where
             .subcommand(SubCommand::with_name("submit")
                 .about("Submit the solution")
             )
-            .subcommand(SubCommand::with_name("config")
-                .about("Configure advent of code settings")
-                .arg(Arg::with_name("session")
-                    .short("s")
-                    .long("session")
-                    .help("Set the session token / cookie")
-                    .value_name("TOKEN")
-                    .takes_value(true)
-                )
-            )
+            .subcommand(new_config_subcommand())
             .get_matches();
 
         match cli.subcommand() {
             ("submit", _) => self.submit(),
-            ("config", Some(args)) => self.config(args),
+            (CONFIG_SUBCOMMAND, Some(args)) => run_config_subcommand(args),
             _ => self.default(),
         }
     }
@@ -72,14 +63,28 @@ impl<'a, F, R> Cli<'a, F, R> where
 
         Ok(())
     }
+}
 
-    fn config(&self, args: &ArgMatches) -> Result<()> {
-        if let Some(token) = args.value_of("session") {
-            config::set_session_token(token)?;
-        }
+pub const CONFIG_SUBCOMMAND: &str = "config";
 
-        Ok(())
+pub fn new_config_subcommand() -> App<'static, 'static> {
+    SubCommand::with_name(CONFIG_SUBCOMMAND)
+        .about("Configure advent of code settings")
+        .arg(Arg::with_name("session")
+            .short("s")
+            .long("session")
+            .help("Set the session token / cookie")
+            .value_name("TOKEN")
+            .takes_value(true)
+        )
+}
+
+pub fn run_config_subcommand(args: &ArgMatches) -> Result<()> {
+    if let Some(token) = args.value_of("session") {
+        config::set_session_token(token)?;
     }
+
+    Ok(())
 }
 
 pub fn run<F, R>(event: &str, day: u8, level: u8, code: F) where
