@@ -75,7 +75,7 @@ pub struct Member {
     local_score: u32,
     stars: u32,
     completion_day_level: BTreeMap<String, Level>,
-    last_star_ts: DateTime<Utc>,
+    last_star_ts: DateTime<Local>,
 }
 
 impl Member {
@@ -112,5 +112,11 @@ impl Level {
 
 #[derive(Serialize,Deserialize,Debug,Clone)]
 pub struct StarInfo {
-    get_star_ts: DateTime<Utc>,
+    get_star_ts: DateTime<Local>,
+}
+
+impl StarInfo {
+    pub fn date(&self) -> DateTime<Local> {
+        self.get_star_ts
+    }
 }
