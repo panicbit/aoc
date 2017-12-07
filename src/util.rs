@@ -22,7 +22,7 @@ pub fn unlock_date(year: u32, day: u8) -> Result<Option<DateTime<Local>>> {
         return Ok(None)
     }
 
-    let date = Eastern.ymd(year as i32, 12, day as u32).with_timezone(&Local).and_hms(0, 0, 0);
+    let date = Eastern.ymd(year as i32, 12, day as u32).and_hms(0, 0, 0).with_timezone(&Local);
 
     Ok(Some(date))
 }
