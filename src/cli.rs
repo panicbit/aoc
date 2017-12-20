@@ -1,6 +1,7 @@
 use std::fmt::Display;
 use {config, Result, Client};
 use clap::{App, SubCommand, Arg, ArgMatches};
+use failure::ResultExt;
 
 struct Cli<'a, F, R> where
     F: Fn(&str) -> R,
@@ -30,11 +31,15 @@ impl<'a, F, R> Cli<'a, F, R> where
             .subcommand(SubCommand::with_name("submit")
                 .about("Submit the solution")
             )
+            .subcommand(SubCommand::with_name("open")
+                .about("Open the day's page in the browser")
+            )
             .subcommand(new_config_subcommand())
             .get_matches();
 
         match cli.subcommand() {
             ("submit", _) => self.submit(),
+            ("open", _) => self.open(),
             (CONFIG_SUBCOMMAND, Some(args)) => run_config_subcommand(args),
             _ => self.default(),
         }
@@ -61,6 +66,12 @@ impl<'a, F, R> Cli<'a, F, R> where
 
         println!("{}", response);
 
+        Ok(())
+    }
+
+    fn open(&self) -> Result<()> {
+        let url = format!("https://adventofcode.com/{}/day/{}", self.event, self.day);
+        ::open::that(&url).with_context(|_| format!("Failed to open '{}'", url))?;
         Ok(())
     }
 }
