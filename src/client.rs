@@ -1,7 +1,7 @@
 use std::fs::File;
 use std::collections::HashMap;
 use std::io::{Read, Write};
-use reqwest::header::Cookie;
+use reqwest::header::COOKIE;
 use cachedir::{CacheDirConfig, CacheDir};
 use {reqwest, Result};
 
@@ -58,11 +58,10 @@ impl Client {
 
     fn download_input(&self, day: u8) -> Result<String> {
         let url = format!("https://adventofcode.com/{}/day/{}/input", self.event, day);
-        let mut cookie = Cookie::new();
-        cookie.set("session", self.session_token.clone());
+        let cookie = format!("session={}", self.session_token);
         let input = self.client
             .get(&url)
-            .header(cookie)
+            .header(COOKIE, cookie)
             .send()?
             .error_for_status()?
             .text()?;
@@ -75,8 +74,7 @@ impl Client {
         use select::predicate::Name;
 
         let url = format!("https://adventofcode.com/{}/day/{}/answer", self.event, day);
-        let mut cookie = Cookie::new();
-        cookie.set("session", self.session_token.clone());
+        let cookie = format!("session={}", self.session_token);
 
         let mut params = HashMap::new();
         params.insert("level", level.to_string());
@@ -84,7 +82,7 @@ impl Client {
 
         let response = self.client
             .post(&url)
-            .header(cookie)
+            .header(COOKIE, cookie)
             .form(&params)
             .send()?
             .error_for_status()?

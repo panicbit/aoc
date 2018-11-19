@@ -103,8 +103,8 @@ pub fn run<F, R>(event: &str, day: u8, level: u8, code: F) where
     R: Display,
 {
     if let Err(error) = Cli::new(event, day, level, code).run() {
-        println!("Error: {}", error.cause());
-        for cause in error.causes().skip(1) {
+        println!("Error: {}", error.as_fail());
+        for cause in error.iter_chain().skip(1) {
             println!("caused by: {}", cause);
         }
     }

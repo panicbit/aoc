@@ -1,5 +1,5 @@
 use reqwest::Client;
-use reqwest::header::Cookie;
+use reqwest::header::COOKIE;
 use std::collections::BTreeMap;
 use failure::ResultExt;
 use chrono::prelude::*;
@@ -24,12 +24,11 @@ impl Leaderboard {
 
     pub fn fetch(leaderboard_url: &str, session_token: &str) -> Result<Leaderboard> {
         let client = Client::new();
-        let mut cookie = Cookie::new();
-        cookie.append("session", session_token.to_owned());
+        let cookie = format!("session={}", session_token);
 
         let mut resp = client
             .get(leaderboard_url)
-            .header(cookie)
+            .header(COOKIE, cookie)
             .send()?;
 
         let leaderboard = resp.json::<Leaderboard>()?;
