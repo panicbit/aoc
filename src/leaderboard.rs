@@ -25,13 +25,18 @@ impl Leaderboard {
     pub fn fetch(leaderboard_url: &str, session_token: &str) -> Result<Leaderboard> {
         let client = Client::new();
         let cookie = format!("session={}", session_token);
+        println!("url: {}", leaderboard_url);
+        println!("cookie: {}", cookie);
 
         let mut resp = client
             .get(leaderboard_url)
             .header(COOKIE, cookie)
-            .send()?;
+            .send()?
+            .error_for_status()?;
 
         let leaderboard = resp.json::<Leaderboard>()?;
+
+        println!("{:#?}", leaderboard);
 
         Ok(leaderboard)
     }
@@ -74,6 +79,7 @@ pub struct Member {
     local_score: u32,
     stars: u32,
     completion_day_level: BTreeMap<String, Level>,
+    #[serde(with = "ts")]
     last_star_ts: DateTime<Local>,
 }
 
@@ -111,11 +117,53 @@ impl Level {
 
 #[derive(Serialize,Deserialize,Debug,Clone)]
 pub struct StarInfo {
+    #[serde(with = "ts")]
     get_star_ts: DateTime<Local>,
 }
 
 impl StarInfo {
     pub fn date(&self) -> DateTime<Local> {
         self.get_star_ts
+    }
+}
+
+mod ts {
+    use serde::{ser, de, Deserialize, Serialize};
+    use serde::de::Error;
+    use chrono::{TimeZone, DateTime, Local};
+
+    #[derive(Deserialize)]
+    #[serde(untagged)]
+    enum Ts {
+        Int(i64),
+        String(String),
+    }
+
+    pub fn deserialize<'de, D>(de: D) -> Result<DateTime<Local>, D::Error>
+        where D: de::Deserializer<'de>
+    {
+        let ts = Ts::deserialize(de)?;
+        let ts = match ts {
+            Ts::Int(ts) => ts,
+            Ts::String(ts) => ts.parse::<i64>().map_err(<_>::custom)?,
+        };
+        let date = Local.timestamp_opt(ts, 0)
+            .single()
+            .ok_or_else(|| <_>::custom("invalid timestamp"))?;
+
+        Ok(date)
+    }
+
+    pub fn serialize<S>(date: &DateTime<Local>, ser: S) -> Result<S::Ok, S::Error>
+        where S: ser::Serializer
+    {
+        let ts = date.timestamp();
+        let ts = ts.to_string();
+
+        if ts == "0" {
+            0u8.serialize(ser)
+        } else {
+            ts.serialize(ser)
+        }
     }
 }
