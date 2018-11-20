@@ -1,0 +1,11 @@
+[package]
+name = "aoc_codegen"
+version = "0.1.0"
+authors = ["panicbit <panicbit.dev@gmail.com>"]
+
+[lib]
+proc-macro = true
+
+[dependencies]
+quote = "0.6.10"
+syn = { version = "0.15.21", features = ["full"] }
