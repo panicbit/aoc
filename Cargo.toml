@@ -16,13 +16,8 @@ serde = "1.0.80"
 serde_derive = "1.0.80"
 structopt-derive = "0.2.13"
 open = "1.2.2"
+chrono = { version = "0.4.6", features = ["serde"] }
 aoc_codegen = { path = "aoc_codegen" }
-
-[dependencies.chrono]
-features = ["serde"]
-version = "0.4.6"
-
-[dependencies.preferences]
-git = "https://github.com/Eh2406/preferences-rs"
-rev = "4f426cf"
-version = "2.0.0"
+config = "0.9.1"
+directories = "1.0.2"
+serde_json = "1.0.33"

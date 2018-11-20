@@ -25,8 +25,6 @@ impl Leaderboard {
     pub fn fetch(leaderboard_url: &str, session_token: &str) -> Result<Leaderboard> {
         let client = Client::new();
         let cookie = format!("session={}", session_token);
-        println!("url: {}", leaderboard_url);
-        println!("cookie: {}", cookie);
 
         let mut resp = client
             .get(leaderboard_url)
@@ -35,8 +33,6 @@ impl Leaderboard {
             .error_for_status()?;
 
         let leaderboard = resp.json::<Leaderboard>()?;
-
-        println!("{:#?}", leaderboard);
 
         Ok(leaderboard)
     }
