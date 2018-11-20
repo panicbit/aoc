@@ -1,6 +1,9 @@
 [package]
 authors = ["panicbit <panicbit.dev@gmail.com>"]
 name = "aoc"
+description = "Advent of code helpers"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/panicbit/aoc"
 version = "0.3.0"
 
 [dependencies]
