@@ -70,7 +70,7 @@ impl Leaderboard {
 #[derive(Serialize,Deserialize,Debug,Clone)]
 pub struct Member {
     id: String,
-    name: String,
+    name: Option<String>,
     global_score: u32,
     local_score: u32,
     stars: u32,
@@ -81,7 +81,10 @@ pub struct Member {
 
 impl Member {
     pub fn name(&self) -> &str {
-        &self.name
+        match &self.name {
+            Some(name) => name,
+            None => &self.id,
+        }
     }
 
     pub fn completed_days(&self) -> &BTreeMap<String, Level> {
