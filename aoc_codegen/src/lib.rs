@@ -3,7 +3,7 @@ extern crate proc_macro;
 #[macro_use] extern crate quote;
 
 use proc_macro::TokenStream;
-use syn::{parse, parse::Parser, punctuated::Punctuated, Expr, ItemFn, FnArg};
+use syn::{parse, parse::Parser, punctuated::Punctuated, Expr, ItemFn};
 
 #[proc_macro_attribute]
 pub fn aoc(attr: TokenStream, item: TokenStream) -> TokenStream {
