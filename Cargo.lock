@@ -23,7 +23,7 @@ dependencies = [
 
 [[package]]
 name = "aoc"
-version = "0.3.1"
+version = "0.3.2"
 dependencies = [
  "aoc_codegen 0.1.0",
  "chrono 0.4.11 (registry+https://github.com/rust-lang/crates.io-index)",
