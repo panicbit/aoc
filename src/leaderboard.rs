@@ -37,7 +37,7 @@ impl Leaderboard {
         Ok(leaderboard)
     }
 
-    pub fn members<'a>(&'a self) -> Box<Iterator<Item=&'a Member> + 'a> {
+    pub fn members<'a>(&'a self) -> Box<dyn Iterator<Item=&'a Member> + 'a> {
         Box::new(self.members.values())
     }
 

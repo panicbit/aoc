@@ -1,7 +1,7 @@
 extern crate reqwest;
-extern crate cachedir;
 extern crate serde_json as json;
 extern crate clap;
+extern crate dirs;
 extern crate select;
 extern crate serde;
 extern crate chrono;
