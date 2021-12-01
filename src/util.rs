@@ -1,6 +1,6 @@
 use chrono::prelude::*;
 use chrono_tz::US::Eastern;
-use Result;
+use crate::Result;
 
 pub fn num_unlocked_days(year: u32) -> Result<u8> {
     let end_of_november = Eastern.ymd(year as i32, 11, 30).and_hms(0, 0, 0);

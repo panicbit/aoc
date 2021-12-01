@@ -3,9 +3,9 @@ use failure::ResultExt;
 use chrono::prelude::*;
 use std::io::ErrorKind::NotFound;
 use std::path::PathBuf;
-use {Result, Leaderboard};
 use std::fs::{self, File};
 use json;
+use crate::{Result, Leaderboard};
 
 #[derive(Serialize,Deserialize,Default)]
 struct Config {

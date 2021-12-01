@@ -2,7 +2,7 @@ use std::fs::File;
 use std::collections::HashMap;
 use std::io::{Read, Write};
 use reqwest::header::COOKIE;
-use {reqwest, Result};
+use crate::{reqwest, Result};
 
 pub struct Client {
     event: String,

@@ -4,7 +4,7 @@ use std::collections::BTreeMap;
 use failure::ResultExt;
 use chrono::prelude::*;
 use chrono::Duration;
-use {util, Result};
+use crate::{util, Result};
 
 #[derive(Serialize,Deserialize,Debug,Clone)]
 pub struct Leaderboard {

@@ -1,5 +1,5 @@
 use std::fmt::Display;
-use {config, Result, Client};
+use crate::{config, Result, Client};
 use clap::{App, SubCommand, Arg, ArgMatches};
 use failure::ResultExt;
 
