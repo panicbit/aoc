@@ -1,9 +1,11 @@
+use std::collections::BTreeMap;
+
+use chrono::Duration;
+use chrono::prelude::*;
+use failure::ResultExt;
 use reqwest::blocking::Client;
 use reqwest::header::COOKIE;
-use std::collections::BTreeMap;
-use failure::ResultExt;
-use chrono::prelude::*;
-use chrono::Duration;
+
 use crate::{util, Result};
 
 #[derive(Serialize,Deserialize,Debug,Clone)]

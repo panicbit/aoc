@@ -1,10 +1,12 @@
-use directories::ProjectDirs;
-use failure::ResultExt;
-use chrono::prelude::*;
 use std::io::ErrorKind::NotFound;
 use std::path::PathBuf;
 use std::fs::{self, File};
-use json;
+
+use chrono::prelude::*;
+use directories::ProjectDirs;
+use failure::ResultExt;
+use serde_json as json;
+
 use crate::{Result, Leaderboard};
 
 #[derive(Serialize,Deserialize,Default)]
@@ -21,7 +23,7 @@ impl Config {
         let file = match File::open(path) {
             Ok(file) => file,
             Err(ref err) if err.kind() == NotFound => return Ok(Self::default()),
-            Err(err) => Err(err)?,
+            Err(err) => return Err(err.into()),
         };
         let config = json::from_reader(file)?;
 

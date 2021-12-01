@@ -18,7 +18,7 @@ pub fn num_unlocked_days(year: u32) -> Result<u8> {
 }
 
 pub fn unlock_date(year: u32, day: u8) -> Result<Option<DateTime<Local>>> {
-    if day < 1 || day > 25 {
+    if !(1..=25).contains(&day) {
         return Ok(None)
     }
 
