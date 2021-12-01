@@ -7,7 +7,7 @@ use {reqwest, Result};
 pub struct Client {
     event: String,
     session_token: String,
-    client: reqwest::Client,
+    client: reqwest::blocking::Client,
     cache_dir: std::path::PathBuf,
 }
 
@@ -30,7 +30,7 @@ impl Client {
             cache_dir,
             event: event.into(),
             session_token: session_token.into(),
-            client: reqwest::Client::new(),
+            client: reqwest::blocking::Client::new(),
         })
     }
 
@@ -41,7 +41,7 @@ impl Client {
 
         let input = self.download_input(day)?;
         self.cache_input(day, &input)?;
-        
+
         Ok(input)
     }
 
@@ -72,7 +72,7 @@ impl Client {
             .send()?
             .error_for_status()?
             .text()?;
-        
+
         Ok(input)
     }
 
