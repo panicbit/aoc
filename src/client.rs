@@ -1,8 +1,10 @@
-use std::fs::File;
+use std::fs::{self, File};
 use std::collections::HashMap;
-use std::io::{Read, Write};
+use std::io::{self, Read, Write};
+
 use reqwest::header::COOKIE;
-use {reqwest, Result};
+
+use crate::Result;
 
 pub struct Client {
     event: String,
@@ -17,18 +19,18 @@ impl Client {
         S: Into<String>,
     {
         let event = event.into();
-        let cache_dir = dirs::cache_dir().ok_or(
-            std::io::Error::new(std::io::ErrorKind::Other, "This OS is not supported")
-        )?.join("advent_of_code").join(&event);
+        let cache_dir = dirs::cache_dir()
+            .ok_or_else(|| io::Error::new(io::ErrorKind::Other, "This OS is not supported"))?
+            .join("advent_of_code").join(&event);
 
-        std::fs::create_dir_all(&cache_dir).map_err(|err| {
+        fs::create_dir_all(&cache_dir).map_err(|err| {
             eprintln!("Failed to create cache dir \"{}\": {}", cache_dir.display(), err);
             err
         })?;
 
         Ok(Self {
             cache_dir,
-            event: event.into(),
+            event,
             session_token: session_token.into(),
             client: reqwest::blocking::Client::new(),
         })
