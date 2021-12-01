@@ -18,7 +18,7 @@ pub fn aoc(attr: TokenStream, item: TokenStream) -> TokenStream {
     };
     let fun = parse::<ItemFn>(item)
         .ok().expect("aoc can only be applied to functions");
-    let ident = &fun.ident;
+    let ident = &fun.sig.ident;
 
     let out = quote! {
         fn #ident() {

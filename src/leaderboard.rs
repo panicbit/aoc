@@ -1,4 +1,4 @@
-use reqwest::Client;
+use reqwest::blocking::Client;
 use reqwest::header::COOKIE;
 use std::collections::BTreeMap;
 use failure::ResultExt;
@@ -26,7 +26,7 @@ impl Leaderboard {
         let client = Client::new();
         let cookie = format!("session={}", session_token);
 
-        let mut resp = client
+        let resp = client
             .get(leaderboard_url)
             .header(COOKIE, cookie)
             .send()?
