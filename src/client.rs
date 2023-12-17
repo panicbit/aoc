@@ -1,5 +1,5 @@
-use std::fs::{self, File};
 use std::collections::HashMap;
+use std::fs::{self, File};
 use std::io::{self, Read, Write};
 
 use reqwest::header::COOKIE;
@@ -14,17 +14,23 @@ pub struct Client {
 }
 
 impl Client {
-    pub fn new<E, S>(event: E, session_token: S) -> Result<Self> where
+    pub fn new<E, S>(event: E, session_token: S) -> Result<Self>
+    where
         E: Into<String>,
         S: Into<String>,
     {
         let event = event.into();
         let cache_dir = dirs::cache_dir()
             .ok_or_else(|| io::Error::new(io::ErrorKind::Other, "This OS is not supported"))?
-            .join("advent_of_code").join(&event);
+            .join("advent_of_code")
+            .join(&event);
 
         fs::create_dir_all(&cache_dir).map_err(|err| {
-            eprintln!("Failed to create cache dir \"{}\": {}", cache_dir.display(), err);
+            eprintln!(
+                "Failed to create cache dir \"{}\": {}",
+                cache_dir.display(),
+                err
+            );
             err
         })?;
 
@@ -68,8 +74,9 @@ impl Client {
     fn download_input(&self, day: u8) -> Result<String> {
         let url = format!("https://adventofcode.com/{}/day/{}/input", self.event, day);
         let cookie = format!("session={}", self.session_token);
-        let input = self.client
-            .get(&url)
+        let input = self
+            .client
+            .get(url)
             .header(COOKIE, cookie)
             .send()?
             .error_for_status()?
@@ -89,8 +96,9 @@ impl Client {
         params.insert("level", level.to_string());
         params.insert("answer", solution.into());
 
-        let response = self.client
-            .post(&url)
+        let response = self
+            .client
+            .post(url)
             .header(COOKIE, cookie)
             .form(&params)
             .send()?
@@ -98,7 +106,10 @@ impl Client {
             .text()?;
 
         let doc = Document::from(response.as_str());
-        let node = doc.find(Name("main")).next().ok_or_else(|| format_err!("Response element not found"))?;
+        let node = doc
+            .find(Name("main"))
+            .next()
+            .ok_or_else(|| format_err!("Response element not found"))?;
         let text = node.text();
         // let text = text.trim().split(".  ").next().unwrap_or("");
         let text = format!("{}.", text.trim());

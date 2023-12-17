@@ -1,11 +1,12 @@
 use std::fmt::Display;
 
-use clap::{App, SubCommand, Arg, ArgMatches};
+use clap::{Arg, ArgMatches, Command};
 use failure::ResultExt;
 
-use crate::{config, Result, Client};
+use crate::{config, Client, Result};
 
-struct Cli<'a, F, R> where
+struct Cli<'a, F, R>
+where
     F: Fn(&str) -> R,
     R: Display,
 {
@@ -15,7 +16,8 @@ struct Cli<'a, F, R> where
     code: F,
 }
 
-impl<'a, F, R> Cli<'a, F, R> where
+impl<'a, F, R> Cli<'a, F, R>
+where
     F: Fn(&str) -> R,
     R: Display,
 {
@@ -29,20 +31,23 @@ impl<'a, F, R> Cli<'a, F, R> where
     }
 
     fn run(&self) -> Result<()> {
-        let cli = App::new(format!("Advent of Code {} - Day {} part {}", self.event, self.day, self.level))
-            .subcommand(SubCommand::with_name("submit")
-                .about("Submit the solution")
-            )
-            .subcommand(SubCommand::with_name("open")
-                .about("Open the day's page in the browser")
-            )
-            .subcommand(new_config_subcommand())
-            .get_matches();
+        let cli = Command::new(format!(
+            "Advent of Code {} - Day {} part {}",
+            self.event, self.day, self.level
+        ))
+        .subcommand(Command::new("submit").about("Submit the solution"))
+        .subcommand(Command::new("open").about("Open the day's page in the browser"))
+        .subcommand(new_config_subcommand())
+        .get_matches();
 
-        match cli.subcommand() {
+        let Some(subcommand) = cli.subcommand() else {
+            return self.default();
+        };
+
+        match subcommand {
             ("submit", _) => self.submit(),
             ("open", _) => self.open(),
-            (CONFIG_SUBCOMMAND, Some(args)) => run_config_subcommand(args),
+            (CONFIG_SUBCOMMAND, args) => run_config_subcommand(args),
             _ => self.default(),
         }
     }
@@ -62,7 +67,10 @@ impl<'a, F, R> Cli<'a, F, R> where
         let input = client.get_input(self.day)?;
         let result = (self.code)(&input).to_string();
 
-        println!("Submitting '{}' for AoC {} day {} part {}\n", result, self.event, self.day, self.level);
+        println!(
+            "Submitting '{}' for AoC {} day {} part {}\n",
+            result, self.event, self.day, self.level
+        );
 
         let response = client.submit_solution(self.day, self.level, &result)?;
 
@@ -80,27 +88,29 @@ impl<'a, F, R> Cli<'a, F, R> where
 
 pub const CONFIG_SUBCOMMAND: &str = "config";
 
-pub fn new_config_subcommand() -> App<'static, 'static> {
-    SubCommand::with_name(CONFIG_SUBCOMMAND)
+pub fn new_config_subcommand() -> Command {
+    Command::new(CONFIG_SUBCOMMAND)
         .about("Configure advent of code settings")
-        .arg(Arg::with_name("session")
-            .short("s")
-            .long("session")
-            .help("Set the session token / cookie")
-            .value_name("TOKEN")
-            .takes_value(true)
+        .arg(
+            Arg::new("session")
+                .short('s')
+                .long("session")
+                .help("Set the session token / cookie")
+                .value_name("TOKEN")
+                .num_args(1),
         )
 }
 
 pub fn run_config_subcommand(args: &ArgMatches) -> Result<()> {
-    if let Some(token) = args.value_of("session") {
+    if let Some(token) = args.get_one::<String>("session") {
         config::set_session_token(token)?;
     }
 
     Ok(())
 }
 
-pub fn run<F, R>(event: &str, day: u8, level: u8, code: F) where
+pub fn run<F, R>(event: &str, day: u8, level: u8, code: F)
+where
     F: Fn(&str) -> R,
     R: Display,
 {
