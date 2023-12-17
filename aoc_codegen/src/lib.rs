@@ -1,6 +1,8 @@
 extern crate proc_macro;
-#[macro_use] extern crate syn;
-#[macro_use] extern crate quote;
+#[macro_use]
+extern crate syn;
+#[macro_use]
+extern crate quote;
 
 use proc_macro::TokenStream;
 use syn::{parse, parse::Parser, punctuated::Punctuated, Expr, ItemFn};
@@ -17,7 +19,8 @@ pub fn aoc(attr: TokenStream, item: TokenStream) -> TokenStream {
         _ => panic!("aoc: Invalid number of parameters"),
     };
     let fun = parse::<ItemFn>(item)
-        .ok().expect("aoc can only be applied to functions");
+        .ok()
+        .expect("aoc can only be applied to functions");
     let ident = &fun.sig.ident;
 
     let out = quote! {
