@@ -21,3 +21,5 @@ chrono = { version = "0.4.31", features = ["serde"] }
 aoc_codegen = { version = "0.1", path = "aoc_codegen" }
 directories = "5.0.1"
 serde_json = "1.0.108"
+
+[workspace]
