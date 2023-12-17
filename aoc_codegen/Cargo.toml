@@ -5,6 +5,7 @@ version = "0.1.0"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/panicbit/aoc"
 authors = ["panicbit <panicbit.dev@gmail.com>"]
+edition = "2021"
 
 [lib]
 proc-macro = true
