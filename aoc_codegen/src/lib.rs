@@ -18,9 +18,7 @@ pub fn aoc(attr: TokenStream, item: TokenStream) -> TokenStream {
         [event, day, level] => (event, day, level),
         _ => panic!("aoc: Invalid number of parameters"),
     };
-    let fun = parse::<ItemFn>(item)
-        .ok()
-        .expect("aoc can only be applied to functions");
+    let fun = parse::<ItemFn>(item).expect("aoc can only be applied to functions");
     let ident = &fun.sig.ident;
 
     let out = quote! {
