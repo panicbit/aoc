@@ -2,6 +2,7 @@ use std::collections::HashMap;
 use std::fs::{self, File};
 use std::io::{self, Read, Write};
 
+use anyhow::Context;
 use reqwest::header::COOKIE;
 
 use crate::Result;
@@ -109,7 +110,7 @@ impl Client {
         let node = doc
             .find(Name("main"))
             .next()
-            .ok_or_else(|| format_err!("Response element not found"))?;
+            .context("Response element not found")?;
         let text = node.text();
         // let text = text.trim().split(".  ").next().unwrap_or("");
         let text = format!("{}.", text.trim());

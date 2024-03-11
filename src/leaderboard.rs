@@ -1,14 +1,14 @@
 use std::collections::BTreeMap;
 
-use chrono::Duration;
+use anyhow::Context;
 use chrono::prelude::*;
-use failure::ResultExt;
+use chrono::Duration;
 use reqwest::blocking::Client;
 use reqwest::header::COOKIE;
 
 use crate::{util, Result};
 
-#[derive(Serialize,Deserialize,Debug,Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Leaderboard {
     owner_id: String,
     event: String,
@@ -39,12 +39,14 @@ impl Leaderboard {
         Ok(leaderboard)
     }
 
-    pub fn members<'a>(&'a self) -> Box<dyn Iterator<Item=&'a Member> + 'a> {
+    pub fn members<'a>(&'a self) -> Box<dyn Iterator<Item = &'a Member> + 'a> {
         Box::new(self.members.values())
     }
 
     fn year(&self) -> Result<u32> {
-        let year = self.event.parse::<u32>()
+        let year = self
+            .event
+            .parse::<u32>()
             .context("Event name is not a valid year")?;
         Ok(year)
     }
@@ -63,13 +65,13 @@ impl Leaderboard {
     }
 
     pub fn duration_until_next_unlock(&self) -> Result<Option<Duration>> {
-        Ok(self.next_unlock_date()?.map(|unlock_date|
-            unlock_date.signed_duration_since(Utc::now())
-        ))
+        Ok(self
+            .next_unlock_date()?
+            .map(|unlock_date| unlock_date.signed_duration_since(Utc::now())))
     }
 }
 
-#[derive(Serialize,Deserialize,Debug,Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Member {
     id: String,
     name: Option<String>,
@@ -98,11 +100,11 @@ impl Member {
     }
 }
 
-#[derive(Serialize,Deserialize,Debug,Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Level {
-    #[serde(rename="1")]
+    #[serde(rename = "1")]
     one: StarInfo,
-    #[serde(rename="2")]
+    #[serde(rename = "2")]
     two: Option<StarInfo>,
 }
 
@@ -116,7 +118,7 @@ impl Level {
     }
 }
 
-#[derive(Serialize,Deserialize,Debug,Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct StarInfo {
     #[serde(with = "ts")]
     get_star_ts: DateTime<Local>,
@@ -129,9 +131,9 @@ impl StarInfo {
 }
 
 mod ts {
-    use serde::{ser, de, Deserialize, Serialize};
+    use chrono::{DateTime, Local, TimeZone};
     use serde::de::Error;
-    use chrono::{TimeZone, DateTime, Local};
+    use serde::{de, ser, Deserialize, Serialize};
 
     #[derive(Deserialize)]
     #[serde(untagged)]
@@ -141,14 +143,16 @@ mod ts {
     }
 
     pub fn deserialize<'de, D>(de: D) -> Result<DateTime<Local>, D::Error>
-        where D: de::Deserializer<'de>
+    where
+        D: de::Deserializer<'de>,
     {
         let ts = Ts::deserialize(de)?;
         let ts = match ts {
             Ts::Int(ts) => ts,
             Ts::String(ts) => ts.parse::<i64>().map_err(<_>::custom)?,
         };
-        let date = Local.timestamp_opt(ts, 0)
+        let date = Local
+            .timestamp_opt(ts, 0)
             .single()
             .ok_or_else(|| <_>::custom("invalid timestamp"))?;
 
@@ -156,7 +160,8 @@ mod ts {
     }
 
     pub fn serialize<S>(date: &DateTime<Local>, ser: S) -> Result<S::Ok, S::Error>
-        where S: ser::Serializer
+    where
+        S: ser::Serializer,
     {
         let ts = date.timestamp();
         let ts = ts.to_string();

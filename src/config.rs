@@ -1,15 +1,15 @@
+use std::fs::{self, File};
 use std::io::ErrorKind::NotFound;
 use std::path::PathBuf;
-use std::fs::{self, File};
 
+use anyhow::Context;
 use chrono::prelude::*;
 use directories::ProjectDirs;
-use failure::ResultExt;
 use serde_json as json;
 
-use crate::{Result, Leaderboard};
+use crate::{Leaderboard, Result};
 
-#[derive(Serialize,Deserialize,Default)]
+#[derive(Serialize, Deserialize, Default)]
 struct Config {
     leaderboard_url: Option<String>,
     session_token: String,
@@ -40,7 +40,7 @@ impl Config {
 
 fn config_path() -> Result<PathBuf> {
     let dirs = ProjectDirs::from("", "panicbit", "advent_of_code")
-    .ok_or_else(|| format_err!("Failed to find config folder"))?;
+        .context("Failed to find config folder")?;
     let dir = dirs.config_dir();
 
     fs::create_dir_all(dir)?;
@@ -50,12 +50,12 @@ fn config_path() -> Result<PathBuf> {
 
 pub fn leaderboard_url() -> Result<String> {
     let config = Config::load()?;
-    let url = config.leaderboard_url.ok_or_else(|| format_err!(
+    let url = config.leaderboard_url.context(
         "Leaderboard url not set.\n\
         Set one using `--url https://adventofcode.com/YEAR/leaderboard/private/view/ID`.\n\
         You can get this URL by viewing your private leaderboard\n\
-        and copying it from your browser's address bar."
-    ))?;
+        and copying it from your browser's address bar.",
+    )?;
     Ok(url)
 }
 
@@ -97,7 +97,9 @@ pub fn set_last_api_access(last_access: Option<DateTime<Local>>) -> Result<()> {
     let mut config = Config::load()?;
 
     config.last_api_access = last_access;
-    config.save().context("Failed to save last API access timestamp")?;
+    config
+        .save()
+        .context("Failed to save last API access timestamp")?;
 
     Ok(())
 }

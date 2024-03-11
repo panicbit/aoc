@@ -11,7 +11,6 @@ edition = "2021"
 chrono-tz = "0.8.4"
 clap = { version = "4.4.11", features = ["string"] }
 dirs = "5.0.1"
-failure = "0.1.8"
 reqwest = { version = "0.11.22", features = ["blocking", "json"] }
 select = "0.6.0"
 serde = "1.0.193"
@@ -21,5 +20,6 @@ chrono = { version = "0.4.31", features = ["serde"] }
 aoc_codegen = { version = "0.2", path = "aoc_codegen" }
 directories = "5.0.1"
 serde_json = "1.0.108"
+anyhow = "1.0.80"
 
 [workspace]

@@ -1,7 +1,7 @@
 use std::fmt::Display;
 
+use anyhow::Context;
 use clap::{Arg, ArgMatches, Command};
-use failure::ResultExt;
 
 use crate::{config, Client, Result};
 
@@ -81,7 +81,7 @@ where
 
     fn open(&self) -> Result<()> {
         let url = format!("https://adventofcode.com/{}/day/{}", self.event, self.day);
-        ::open::that(&url).with_context(|_| format!("Failed to open '{}'", url))?;
+        ::open::that(&url).with_context(|| format!("Failed to open '{}'", url))?;
         Ok(())
     }
 }
@@ -115,9 +115,6 @@ where
     R: Display,
 {
     if let Err(error) = Cli::new(event, day, level, code).run() {
-        println!("Error: {}", error.as_fail());
-        for cause in error.iter_chain().skip(1) {
-            println!("caused by: {}", cause);
-        }
+        println!("Error: {:?}", error);
     }
 }
